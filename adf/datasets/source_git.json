@@ -1,0 +1,23 @@
+{
+    "name": "source_git",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "linked_git",
+            "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "DelimitedText",
+        "typeProperties": {
+            "location": {
+                "type": "HttpServerLocation",
+                "relativeUrl": "pnzender/Azure-data-factory/refs/heads/main/source/Fact_Sales_2.csv"
+            },
+            "columnDelimiter": ",",
+            "escapeChar": "\\",
+            "firstRowAsHeader": true,
+            "quoteChar": "\""
+        },
+        "schema": []
+    },
+    "type": "Microsoft.DataFactory/factories/datasets"
+}
