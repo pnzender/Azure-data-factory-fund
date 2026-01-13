@@ -1,1 +1,53 @@
-ADF practice
+# Azure Data Factory Practice - Event-Driven CSV Pipeline
+
+This repo contains my Azure Data Factory (ADF) practice project. It demonstrates an event-triggered pipeline, pipeline orchestration, metadata-driven file processing, and a mapping data flow transformation.
+
+## Architecture (High-level)
+**Trigger:** Upload `Fact_Sales_1.csv` to `source/csvfiles/Fact_Sales_1.csv`
+
+Then ADF runs:
+
+1) `prodPipeline`  
+→ executes `pipelinemanager`  
+→ executes `OnlySelectedFiles`
+
+## Storage Layout
+- `source` container: landing zone (`source/csvfiles/`)
+- `destination` container: staging area (`destination/csvfiles/`)
+- `reporting` container: processed outputs (`reporting/csv/` and `reporting/dataflowOutput/`)
+
+## Pipelines
+
+### prodPipeline
+Orchestrates two pipelines in sequence:
+- `pipelinemanager`
+- `OnlySelectedFiles`
+
+### pipelinemanager
+1. Copy uploaded file from `source/csvfiles` to `destination/csvfiles`
+2. Delete the file from `source/csvfiles` (keep landing zone clean)
+3. Execute `pipelineGit` to ingest an external file from GitHub
+
+### pipelineGit
+Copies a CSV from GitHub (HTTP source) into `destination/csvfiles/`:
+- Source: `Fact_Sales_2.csv` (raw GitHub URL)
+- Sink: `destination/csvfiles/file2.csv`
+
+### OnlySelectedFiles
+1. Get Metadata from `destination/csvfiles` to list files
+2. ForEach file, if `@startswith(item().name,'Fact')`, copy it to `reporting/csv/` using `@item().name`
+3. Run Data Flow `TransformCSV`
+
+## Data Flow: TransformCSV
+- Read from `reporting/csv`
+- Select columns: `transaction_id, transactional_date, product_id, customer_id, payment, price`
+- Filter: `customer_id != 12`
+- Split into payment groups: visa, mastercard, amex
+- Aggregate by `customer_id`
+- Use `alterRows` with `Insert if 1==1`
+- Write **Visa only** to `reporting/dataflowOutput`
+
+## Repo structure
+- `adf/`: exported ADF JSON (pipelines, datasets, triggers, linked services, data flows)
+- `source/`: sample CSV input files
+- `docs/screenshots/`: images of the pipeline and successful runs
