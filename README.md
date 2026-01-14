@@ -1,4 +1,4 @@
-# Azure Data Factory Practice – Event-Driven, Metadata-Driven CSV Pipeline
+# Azure Data Factory Examples – Event-Driven, Metadata-Driven CSV Pipeline
 
 ## Overview
 
